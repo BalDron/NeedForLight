@@ -55,8 +55,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class USpotLightComponent* FlashLight;
 
-	
-
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
@@ -67,15 +65,16 @@ private:
 	float LookSpeed = 10.f;
 	void Look(const FInputActionValue& Value);
 
+
 	ChosenLight ActiveLight = ChosenLight::None;
 
-	
-
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
-	float LightEnergyConsumption = 100.f;
+	float LightEnergyConsumption = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
-	float FlashLightMaxCapacity = 500.f;
+	float FlashLightMaxCapacity = 300.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Lights")
+	float FlashLightLowBoundary = 60.f;
 	float FlashLightCapacity  = 0.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float FlashLightMaxIntensity = 5000.f;
@@ -84,6 +83,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float TorchLightMaxCapacity = 250.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Lights")
+	float TorchLightLowBoundary = 50.f;
 	float TorchLightCapacity = 0.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float TorchLightMaxIntensity = 5000.f;

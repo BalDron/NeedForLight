@@ -98,13 +98,26 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 			break;
 		case ChosenLight::FlashLight:
 			FlashLightCapacity -= LightEnergyConsumption * DeltaTime;
-			if (FlashLightCapacity <= 0.f) {
+			if (FlashLightCapacity > FlashLightLowBoundary) {
+				FlashLight->SetIntensity(FlashLightMaxIntensity);
+			} else if (FlashLightCapacity > 0.f) {
+				FlashLight->SetIntensity(
+					FlashLightMaxIntensity * FlashLightCapacity / FlashLightLowBoundary
+				);
+			} else if (FlashLightCapacity <= 0.f) {
 				FlashLight->SetIntensity(0.f);
 			}
+			UE_LOG(LogTemp, Warning, TEXT("%f"), FlashLightCapacity);
 			break;
 		case ChosenLight::TorchLight:
 			TorchLightCapacity -= LightEnergyConsumption * DeltaTime;
-			if (TorchLightCapacity <= 0.f) {
+			if (TorchLightCapacity > TorchLightLowBoundary) {
+				TorchLight->SetIntensity(TorchLightMaxIntensity);
+			} else if (TorchLightCapacity > 0.f) {
+				TorchLight->SetIntensity(
+					TorchLightMaxIntensity * TorchLightCapacity / TorchLightLowBoundary
+				);
+			} else if (TorchLightCapacity <= 0.f) {
 				TorchLight->SetIntensity(0.f);
 			}
 	}
