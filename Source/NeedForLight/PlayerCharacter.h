@@ -55,6 +55,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class USpotLightComponent* FlashLight;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UCapsuleComponent* FlashLightLitZone;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class USphereComponent* TorchLightLitZone;
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
@@ -91,6 +97,8 @@ private:
 	void TriggerTorchLight(const FInputActionValue& Value);
 
 	void ReloadLight(const FInputActionValue& Value);
+	void TurnFlash(bool On);
+	void TurnTorch(bool On);
 
 	void UpdateLights(float DeltaTime);
 

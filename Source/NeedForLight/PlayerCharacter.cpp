@@ -14,6 +14,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Engine/EngineTypes.h"
@@ -43,6 +45,12 @@ APlayerCharacter::APlayerCharacter()
 	FlashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flash Light"));
 	FlashLight->SetupAttachment(SpringArm);
 	FlashLight->SetIntensity(0.f);
+
+	FlashLightLitZone = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Flashlight Lit Zone"));
+	FlashLightLitZone->SetupAttachment(SpringArm);
+
+	TorchLightLitZone = CreateDefaultSubobject<USphereComponent>(TEXT("Torchlight Lit Zone"));
+	TorchLightLitZone->SetupAttachment(SpringArm);
 }
 
 // Called when the game starts or when spawned
@@ -98,8 +106,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APlayerCharacter::UpdateLights(float DeltaTime) {
 	switch (ActiveLight) {
 		case ChosenLight::None:
+			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
 		case ChosenLight::FlashLight:
+			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			FlashLightCapacity -= LightEnergyConsumption * DeltaTime;
 			if (FlashLightCapacity > FlashLightLowBoundary) {
 				FlashLight->SetIntensity(FlashLightMaxIntensity);
@@ -108,19 +119,22 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 					FlashLightMaxIntensity * FlashLightCapacity / FlashLightLowBoundary
 				);
 			} else if (FlashLightCapacity <= 0.f) {
+				FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				FlashLight->SetIntensity(0.f);
 			}
 			UE_LOG(LogTemp, Warning, TEXT("%f"), FlashLightCapacity);
 			break;
 		case ChosenLight::TorchLight:
 			TorchLightCapacity -= LightEnergyConsumption * DeltaTime;
+			TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			if (TorchLightCapacity > TorchLightLowBoundary) {
 				TorchLight->SetIntensity(TorchLightMaxIntensity);
 			} else if (TorchLightCapacity > 0.f) {
 				TorchLight->SetIntensity(
 					TorchLightMaxIntensity * TorchLightCapacity / TorchLightLowBoundary
 				);
-			} else if (TorchLightCapacity <= 0.f) {
+			} else if (TorchLightCapacity <= 0.f) {	
+				TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				TorchLight->SetIntensity(0.f);
 			}
 	}
@@ -165,39 +179,61 @@ void APlayerCharacter::Look(const FInputActionValue& Value) {
 	}
 }
 
+void APlayerCharacter::TurnFlash(bool On) {
+	if (On) {
+		FlashLight->SetIntensity(FlashLightMaxIntensity);
+	} else {
+		FlashLight->SetIntensity(0.f);
+	}
+}
+
+void APlayerCharacter::TurnTorch(bool On) {
+	if (On) {
+		TorchLight->SetIntensity(TorchLightMaxIntensity);
+	} else {
+		TorchLight->SetIntensity(0.f);
+	}
+}
+
 void APlayerCharacter::TriggerFlashLight(const FInputActionValue& Value) {
 	switch (ActiveLight) {
-		case ChosenLight::None:
+		case ChosenLight::None: {
 			ActiveLight = ChosenLight::FlashLight;
-			FlashLight->SetIntensity(FlashLightMaxIntensity);
+			TurnFlash(true);
 			break;
-		case ChosenLight::FlashLight:
+		}
+		case ChosenLight::FlashLight: {
 			ActiveLight = ChosenLight::None;
-			FlashLight->SetIntensity(0.f);
+			TurnFlash(false);
 			break;
-		case ChosenLight::TorchLight:
+		}
+		case ChosenLight::TorchLight: {
 			ActiveLight = ChosenLight::FlashLight;
-			FlashLight->SetIntensity(FlashLightMaxIntensity);
-			TorchLight->SetIntensity(0.f);
+			TurnFlash(true);
+			TurnTorch(false);
 			break;
+		}
 	}
 }
 
 void APlayerCharacter::TriggerTorchLight(const FInputActionValue& Value) {
 	switch (ActiveLight) {
-		case ChosenLight::None:
+		case ChosenLight::None: {
 			ActiveLight = ChosenLight::TorchLight;
-			TorchLight->SetIntensity(TorchLightMaxIntensity);
+			TurnTorch(true);
 			break;
-		case ChosenLight::FlashLight:
+		}
+		case ChosenLight::FlashLight: {
 			ActiveLight = ChosenLight::TorchLight;
-			FlashLight->SetIntensity(0.f);
-			TorchLight->SetIntensity(TorchLightMaxIntensity);
+			TurnTorch(true);
+			TurnFlash(false);
 			break;
-		case ChosenLight::TorchLight:
+		}
+		case ChosenLight::TorchLight: {
 			ActiveLight = ChosenLight::None;
-			TorchLight->SetIntensity(0.f);
+			TurnTorch(false);
 			break;
+		}
 	}
 }
 
