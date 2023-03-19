@@ -2,6 +2,8 @@
 
 
 #include "MortalityComponent.h"
+#include "GameFramework/Actor.h"
+// #include "Components/PrimitiveComponent.h"
 
 
 // Sets default values for this component's properties
@@ -20,7 +22,7 @@ void UMortalityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	TimeLeft = TimeToDie;
 	
 }
 
@@ -30,6 +32,46 @@ void UMortalityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (State == MortalState::Dead) {
+		UE_LOG(LogTemp, Warning, TEXT("%s is dead."), *GetOwner()->GetName());
+	} else if (IsOwnerLit()) {
+		UE_LOG(LogTemp, Warning, TEXT("%s is lit"), *GetOwner()->GetName());
+		State = MortalState::Lit;
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("%s is NOT lit"), *GetOwner()->GetName());
+		State = MortalState::UnLit;
+	}
+
+	switch (State) {
+		case MortalState::Lit: {
+			TimeLeft = TimeToDie;
+			break;
+		} case MortalState::UnLit: {
+			
+			break;
+		} case MortalState::Dead: {
+			break;
+		}
+	}
 }
 
+bool UMortalityComponent::IsOwnerLit() {
+	AActor* Owner = GetOwner();
+	TArray<UPrimitiveComponent*> Components;
+	Owner->GetOverlappingComponents(Components);
+	for (UPrimitiveComponent* Component : Components) {
+		if (Component->ComponentHasTag(TEXT("LitZone"))) {
+			UE_LOG(LogTemp, Display, TEXT("lit by component"));
+			return true;
+		}
+	}
+	// TArray<AActor*> Actors;
+	// Owner->GetOverlappingActors(Actors);
+	// for (AActor* Actor : Actors) {
+	// 	if (Actor->ActorHasTag(TEXT("LitZone"))) {
+	// 		UE_LOG(LogTemp, Display, TEXT("lit by actor"));
+	// 		return true;
+	// 	}
+	// }
+	return false;
+}

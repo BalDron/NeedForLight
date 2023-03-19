@@ -7,6 +7,12 @@
 #include "MortalityComponent.generated.h"
 
 
+enum class MortalState {
+	Lit,
+	UnLit,
+	Dead,
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NEEDFORLIGHT_API UMortalityComponent : public UActorComponent
 {
@@ -24,6 +30,14 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
-	
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Mortality")
+	float TimeToDie = 10.f;
+
+	MortalState State = MortalState::Lit;
+
+	float TimeLeft;
+
+	UFUNCTION()
+	bool IsOwnerLit();
 };
