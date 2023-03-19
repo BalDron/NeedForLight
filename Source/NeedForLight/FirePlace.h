@@ -61,5 +61,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Light")
 	float FireIntensity = 10000.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Light")
+	class USphereComponent* FireLitZone;
+
 	float Energy;
 };

@@ -4,6 +4,7 @@
 #include "FirePlace.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Components/SceneComponent.h"
 #include "WoodStock.h"
 #include "Components/PointLightComponent.h"
@@ -26,6 +27,9 @@ AFirePlace::AFirePlace()
 
 	WoodStockPlace = CreateDefaultSubobject<USceneComponent>(TEXT("WoodStock"));
 	WoodStockPlace->SetupAttachment(RootComponent);
+
+	FireLitZone = CreateDefaultSubobject<USphereComponent>(TEXT("Fire Lit Zone"));
+	FireLitZone->SetupAttachment(RootComponent);
 
 	Energy = InitialEnergy;
 }
@@ -54,12 +58,15 @@ void AFirePlace::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (Energy > EnergyBoundary) {
+		FireLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		Fire->SetIntensity(FireIntensity);
 		Energy -= EnergyConusmption * DeltaTime;
 	} else if (Energy > 0.f) {
+		FireLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		Fire->SetIntensity(FireIntensity * Energy / EnergyBoundary);
 		Energy -= EnergyConusmption * DeltaTime;
 	} else {
+		FireLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		Energy = 0.f;
 		Fire->SetIntensity(0.f);
 	}
