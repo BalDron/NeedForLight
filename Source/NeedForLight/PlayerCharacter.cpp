@@ -39,23 +39,26 @@ APlayerCharacter::APlayerCharacter()
 	TorchLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Torch Light"));
 	TorchLight->SetupAttachment(SpringArm);
 	TorchLight->SetIntensity(0.f);
-	TorchLightCapacity = TorchLightMaxCapacity;
 
 	FlashLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flash Light"));
 	FlashLight->SetupAttachment(SpringArm);
 	FlashLight->SetIntensity(0.f);
-	FlashLightCapacity = FlashLightMaxCapacity;
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+	FlashLightCapacity = FlashLightMaxCapacity;
+	TorchLightCapacity = TorchLightMaxCapacity;
 	
 	CanGrabWidget = CreateWidget(GetWorld(), CanGrabWidgetClass);
 	CanPutWidget = CreateWidget(GetWorld(), CanPutWidgetClass);
 	HUD = CreateWidget(GetWorld(), HUDClass);
 	HUD->AddToViewport();
+
 }
 
 // Called every frame
