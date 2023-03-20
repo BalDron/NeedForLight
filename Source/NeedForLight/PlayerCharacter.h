@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class USphereComponent* TorchLightLitZone;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UMortalityComponent* MortalityComponent;
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")

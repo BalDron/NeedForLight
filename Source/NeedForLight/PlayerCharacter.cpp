@@ -22,6 +22,7 @@
 #include "DrawDebugHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "WoodStock.h"
+#include "MortalityComponent.h"
 
 
 // Sets default values
@@ -51,6 +52,8 @@ APlayerCharacter::APlayerCharacter()
 
 	TorchLightLitZone = CreateDefaultSubobject<USphereComponent>(TEXT("Torchlight Lit Zone"));
 	TorchLightLitZone->SetupAttachment(SpringArm);
+
+	MortalityComponent = CreateDefaultSubobject<UMortalityComponent>(TEXT("Mortality"));
 }
 
 // Called when the game starts or when spawned
@@ -354,10 +357,11 @@ void APlayerCharacter::PutObject(const FInputActionValue& Value) {
 
 void APlayerCharacter::ReloadLight(const FInputActionValue& Value) {
 	switch (ActiveLight) {
-		case ChosenLight::None:
+		case ChosenLight::None: {
 			UE_LOG(LogTemp, Warning, TEXT("choose a light to reload"));
 			break;
-		case ChosenLight::FlashLight:
+		}
+		case ChosenLight::FlashLight: {
 			if (BatteryCapacity > 0) {
 				FlashLightCapacity += BatteryReloadAmount;
 				BatteryCapacity -= 1;
@@ -368,7 +372,8 @@ void APlayerCharacter::ReloadLight(const FInputActionValue& Value) {
 				UE_LOG(LogTemp, Warning, TEXT("no batteries"));
 			}
 			break;
-		case ChosenLight::TorchLight:
+		}
+		case ChosenLight::TorchLight: {
 			if (WoodCapacity > 0) {
 				TorchLightCapacity += WoodReloadAmount;
 				WoodCapacity -= 1;
@@ -379,6 +384,7 @@ void APlayerCharacter::ReloadLight(const FInputActionValue& Value) {
 				UE_LOG(LogTemp, Warning, TEXT("no wood"));
 			}
 			break;
+		}
 	}
 }
 
