@@ -121,6 +121,7 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 			} else if (FlashLightCapacity <= 0.f) {
 				FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				FlashLight->SetIntensity(0.f);
+				FlashLightCapacity = 0.f;
 			}
 			UE_LOG(LogTemp, Warning, TEXT("%f"), FlashLightCapacity);
 			break;
@@ -136,6 +137,7 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 			} else if (TorchLightCapacity <= 0.f) {	
 				TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				TorchLight->SetIntensity(0.f);
+				TorchLightCapacity = 0.f;
 			}
 	}
 }
