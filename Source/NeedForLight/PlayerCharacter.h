@@ -65,6 +65,13 @@ protected:
 	class UMortalityComponent* MortalityComponent;
 
 private:
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* CallSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* ResponseSound;
+
+	void Call(const FInputActionValue& Value);
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float MovementSpeed = 10.f;

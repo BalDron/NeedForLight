@@ -24,6 +24,8 @@
 #include "WoodStock.h"
 #include "MortalityComponent.h"
 
+#include "NeedForLightGameModeBase.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -104,6 +106,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PEI->BindAction(InputActions->PickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::PickUpObject);
 	PEI->BindAction(InputActions->Put, ETriggerEvent::Triggered, this, &APlayerCharacter::PutObject);
 	PEI->BindAction(InputActions->ReloadLight, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadLight);
+	PEI->BindAction(InputActions->Call, ETriggerEvent::Triggered, this, &APlayerCharacter::Call);
 }
 
 void APlayerCharacter::UpdateLights(float DeltaTime) {
@@ -142,6 +145,20 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 				TorchLight->SetIntensity(0.f);
 				TorchLightCapacity = 0.f;
 			}
+	}
+}
+
+void APlayerCharacter::Call(const FInputActionValue& Value) {
+	if (CallSound != nullptr) {
+		UGameplayStatics::SpawnSoundAttached(
+			CallSound,
+			Camera,
+			TEXT("Camera")
+		);
+		ANeedForLightGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ANeedForLightGameModeBase>();
+		if (GameMode != nullptr) {
+			GameMode->PlayerCalls();
+		}
 	}
 }
 
