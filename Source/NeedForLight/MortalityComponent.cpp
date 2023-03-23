@@ -3,6 +3,7 @@
 
 #include "MortalityComponent.h"
 #include "GameFramework/Actor.h"
+#include "LevelOneGameMode.h"
 // #include "Components/PrimitiveComponent.h"
 
 
@@ -33,12 +34,12 @@ void UMortalityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (State == MortalState::Dead) {
-		UE_LOG(LogTemp, Warning, TEXT("%s is dead."), *GetOwner()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("%s is dead."), *GetOwner()->GetName());
 	} else if (IsOwnerLit()) {
-		UE_LOG(LogTemp, Warning, TEXT("%s is lit"), *GetOwner()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("%s is lit"), *GetOwner()->GetName());
 		State = MortalState::Lit;
 	} else {
-		UE_LOG(LogTemp, Warning, TEXT("%s is NOT lit"), *GetOwner()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("%s is NOT lit"), *GetOwner()->GetName());
 		State = MortalState::UnLit;
 	}
 
@@ -47,7 +48,14 @@ void UMortalityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 			TimeLeft = TimeToDie;
 			break;
 		} case MortalState::UnLit: {
-			
+			TimeLeft -= DeltaTime;
+			if (TimeLeft <= 0) {
+				State = MortalState::Dead;
+				ALevelOneGameMode* GameMode = GetWorld()->GetAuthGameMode<ALevelOneGameMode>();
+				if (GameMode != nullptr) {
+					GameMode->ProcessCharacterDeath(GetOwner());
+				}
+			}
 			break;
 		} case MortalState::Dead: {
 			break;
@@ -61,7 +69,6 @@ bool UMortalityComponent::IsOwnerLit() {
 	Owner->GetOverlappingComponents(Components);
 	for (UPrimitiveComponent* Component : Components) {
 		if (Component->ComponentHasTag(TEXT("LitZone"))) {
-			UE_LOG(LogTemp, Display, TEXT("lit by component"));
 			return true;
 		}
 	}

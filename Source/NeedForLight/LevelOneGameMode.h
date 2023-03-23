@@ -6,6 +6,8 @@
 #include "NeedForLightGameModeBase.h"
 #include "LevelOneGameMode.generated.h"
 
+class ACharacter;
+
 /**
  * 
  */
@@ -20,14 +22,19 @@ protected:
 public:
 	void PlayerCalls();
 
+	void ProcessCharacterDeath(AActor* DeadActor);
+
 private:
 	class AFriendCharacter* FriendCharacter;
 	class APlayerCharacter* PlayerCharacter;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float ResponseDelay = 2.25f;
-
 	FTimerHandle ResponseTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RestartDelay = 3.f;
+	FTimerHandle RestartTimer;
 
 	void CallFriend();
 
