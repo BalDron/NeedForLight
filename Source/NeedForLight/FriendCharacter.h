@@ -29,6 +29,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void Respond();
 	
-	
+private:
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* CallSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* ResponseSound;
+
 };

@@ -24,7 +24,7 @@
 #include "WoodStock.h"
 #include "MortalityComponent.h"
 
-#include "NeedForLightGameModeBase.h"
+#include "LevelOneGameMode.h"
 
 
 // Sets default values
@@ -111,11 +111,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void APlayerCharacter::UpdateLights(float DeltaTime) {
 	switch (ActiveLight) {
-		case ChosenLight::None:
+		case ChosenLight::None: {
 			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
-		case ChosenLight::FlashLight:
+		}
+		case ChosenLight::FlashLight: {
 			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			FlashLightCapacity -= LightEnergyConsumption * DeltaTime;
 			if (FlashLightCapacity > FlashLightLowBoundary) {
@@ -131,7 +132,8 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 			}
 			UE_LOG(LogTemp, Warning, TEXT("%f"), FlashLightCapacity);
 			break;
-		case ChosenLight::TorchLight:
+		}
+		case ChosenLight::TorchLight: {
 			TorchLightCapacity -= LightEnergyConsumption * DeltaTime;
 			TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			if (TorchLightCapacity > TorchLightLowBoundary) {
@@ -145,6 +147,7 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 				TorchLight->SetIntensity(0.f);
 				TorchLightCapacity = 0.f;
 			}
+		}
 	}
 }
 
@@ -155,7 +158,7 @@ void APlayerCharacter::Call(const FInputActionValue& Value) {
 			Camera,
 			TEXT("Camera")
 		);
-		ANeedForLightGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ANeedForLightGameModeBase>();
+		ALevelOneGameMode* GameMode = GetWorld()->GetAuthGameMode<ALevelOneGameMode>();
 		if (GameMode != nullptr) {
 			GameMode->PlayerCalls();
 		}

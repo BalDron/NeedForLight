@@ -3,6 +3,7 @@
 
 #include "FriendCharacter.h"
 #include "MortalityComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -36,3 +37,12 @@ void AFriendCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void AFriendCharacter::Respond() {
+	if (ResponseSound != nullptr) {
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			ResponseSound,
+			GetActorLocation()
+		);
+	}
+}
