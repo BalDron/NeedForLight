@@ -32,9 +32,16 @@ void UMortalityComponent::BeginPlay()
 void UMortalityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	if (State == MortalState::Inactive) {
+		return;
+	}
 	if (State == MortalState::Dead) {
-		// UE_LOG(LogTemp, Warning, TEXT("%s is dead."), *GetOwner()->GetName());
+		ALevelOneGameMode* GameMode = GetWorld()->GetAuthGameMode<ALevelOneGameMode>();
+		if (GameMode != nullptr) {
+			GameMode->ProcessCharacterDeath(GetOwner());
+		}
+		State = MortalState::Inactive;
+		return;
 	} else if (IsOwnerLit()) {
 		// UE_LOG(LogTemp, Warning, TEXT("%s is lit"), *GetOwner()->GetName());
 		State = MortalState::Lit;
@@ -42,24 +49,28 @@ void UMortalityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		// UE_LOG(LogTemp, Warning, TEXT("%s is NOT lit"), *GetOwner()->GetName());
 		State = MortalState::UnLit;
 	}
-
 	switch (State) {
 		case MortalState::Lit: {
 			TimeLeft = TimeToDie;
+			if (GetOwner()->GetActorLocation().Z <= -10.f) {
+				State = MortalState::Dead;
+			}
 			break;
 		} case MortalState::UnLit: {
 			TimeLeft -= DeltaTime;
 			if (TimeLeft <= 0) {
 				State = MortalState::Dead;
-				ALevelOneGameMode* GameMode = GetWorld()->GetAuthGameMode<ALevelOneGameMode>();
-				if (GameMode != nullptr) {
-					GameMode->ProcessCharacterDeath(GetOwner());
-				}
+			}
+			if (GetOwner()->GetActorLocation().Z <= -1000.f) {
+				State = MortalState::Dead;
 			}
 			break;
 		} case MortalState::Dead: {
 			break;
+		} case MortalState::Inactive: {
+			return;
 		}
+
 	}
 }
 

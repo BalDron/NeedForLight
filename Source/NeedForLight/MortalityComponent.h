@@ -11,6 +11,7 @@ enum class MortalState {
 	Lit,
 	UnLit,
 	Dead,
+	Inactive,
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
