@@ -130,6 +130,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory")
 	float GrabRadius = 10.f;
 
+	bool IsCrowBarPicked = false;
+
 	bool CheckForPick(struct FHitResult& OutHitResult) const;
 	void PickUpObject(const FInputActionValue& Value);
 

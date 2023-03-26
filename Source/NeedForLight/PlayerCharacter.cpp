@@ -308,7 +308,7 @@ bool APlayerCharacter::CheckForPut(FHitResult& OutHitResult) const {
 	);
 	if (result) {
 		AActor* HitActor = OutHitResult.GetActor();
-		if (HitActor->Tags.Contains("WoodStock")) {
+		if (HitActor->Tags.Contains("Puttable")) {
 			return true;
 		}
 	}
@@ -331,9 +331,7 @@ bool APlayerCharacter::CheckForPick(FHitResult& OutHitResult) const {
 	if (result) {
 		AActor* HitActor = OutHitResult.GetActor();
 		bool bCheckAnyTags = result && (
-			HitActor->Tags.Contains("Wood")
-			|| HitActor->Tags.Contains("Battery")
-			|| HitActor->Tags.Contains("WoodStock")
+			HitActor->Tags.Contains("Pickable")
 		);
 		if (bCheckAnyTags) {
 			return true;
@@ -360,6 +358,9 @@ void APlayerCharacter::PickUpObject(const FInputActionValue& Value) {
 			if (WoodCapacity < WoodMaxCapacity && WoodStock->GiveWood()) {
 				WoodCapacity += 1;
 			}
+		} else if (HitActor->Tags.Contains("Crowbar") && !IsCrowBarPicked) {
+			IsCrowBarPicked = true;
+			HitActor->Destroy();
 		}
 	}
 }
