@@ -181,4 +181,7 @@ private:
 	bool CanIPut = false;
 	UFUNCTION(BlueprintPure)
 	bool CanPlayerPut() const;
+
+	UFUNCTION(BlueprintPure)
+	bool DoesPlayerHaveCrowbar() const;
 };

@@ -415,3 +415,8 @@ bool APlayerCharacter::CanPlayerPick() const {
 bool APlayerCharacter::CanPlayerPut() const {
 	return CanIPut;
 }
+
+
+bool APlayerCharacter::DoesPlayerHaveCrowbar() const {
+	return IsCrowBarPicked;
+}
