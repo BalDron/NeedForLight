@@ -26,10 +26,10 @@ public:
 
 	// lights
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* FlashLight;
+	UInputAction* TriggerLight;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* TorchLight;
+	UInputAction* SwitchLight;
 	
 	// .. and inventory
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
