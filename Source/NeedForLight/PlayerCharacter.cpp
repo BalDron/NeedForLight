@@ -353,17 +353,10 @@ void APlayerCharacter::PutObject(const FInputActionValue& Value) {
 
 void APlayerCharacter::ReloadLight(const FInputActionValue& Value) {
 	switch (ActiveLight) {
-		case ChosenLight::None: {
-			UE_LOG(LogTemp, Warning, TEXT("choose a light to reload"));
-			break;
-		}
 		case ChosenLight::FlashLight: {
 			if (BatteryCapacity > 0) {
 				FlashLightCapacity += BatteryReloadAmount;
 				BatteryCapacity -= 1;
-				FlashLight->SetIntensity(
-					FlashLightMaxIntensity
-				);
 			} else {
 				UE_LOG(LogTemp, Warning, TEXT("no batteries"));
 			}
@@ -373,9 +366,6 @@ void APlayerCharacter::ReloadLight(const FInputActionValue& Value) {
 			if (WoodCapacity > 0) {
 				TorchLightCapacity += WoodReloadAmount;
 				WoodCapacity -= 1;
-				TorchLight->SetIntensity(
-					TorchLightMaxIntensity
-				);
 			} else {
 				UE_LOG(LogTemp, Warning, TEXT("no wood"));
 			}
