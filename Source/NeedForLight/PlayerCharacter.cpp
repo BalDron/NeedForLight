@@ -72,6 +72,9 @@ void APlayerCharacter::BeginPlay()
 	HUD = CreateWidget(GetWorld(), HUDClass);
 	HUD->AddToViewport();
 
+	TurnFlash(false);
+	TurnTorch(false);
+
 }
 
 // Called every frame
@@ -101,8 +104,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	PEI->BindAction(InputActions->Move, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 	PEI->BindAction(InputActions->Look, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
-	PEI->BindAction(InputActions->FlashLight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerFlashLight);
-	PEI->BindAction(InputActions->TorchLight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerTorchLight);
+	PEI->BindAction(InputActions->TriggerLight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerLight);
+	PEI->BindAction(InputActions->SwitchLight, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchLight);
 	PEI->BindAction(InputActions->PickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::PickUpObject);
 	PEI->BindAction(InputActions->Put, ETriggerEvent::Triggered, this, &APlayerCharacter::PutObject);
 	PEI->BindAction(InputActions->ReloadLight, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadLight);
@@ -110,12 +113,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 }
 
 void APlayerCharacter::UpdateLights(float DeltaTime) {
+	if (!IsLightActive) {
+		return;
+	}
 	switch (ActiveLight) {
-		case ChosenLight::None: {
-			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			TorchLightLitZone->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			break;
-		}
 		case ChosenLight::FlashLight: {
 			FlashLightLitZone->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			FlashLightCapacity -= LightEnergyConsumption * DeltaTime;
@@ -130,7 +131,6 @@ void APlayerCharacter::UpdateLights(float DeltaTime) {
 				FlashLight->SetIntensity(0.f);
 				FlashLightCapacity = 0.f;
 			}
-			UE_LOG(LogTemp, Warning, TEXT("%f"), FlashLightCapacity);
 			break;
 		}
 		case ChosenLight::TorchLight: {
@@ -220,43 +220,34 @@ void APlayerCharacter::TurnTorch(bool On) {
 	}
 }
 
-void APlayerCharacter::TriggerFlashLight(const FInputActionValue& Value) {
+void APlayerCharacter::TriggerLight(const FInputActionValue& Value) {
+	IsLightActive = !IsLightActive;
 	switch (ActiveLight) {
-		case ChosenLight::None: {
-			ActiveLight = ChosenLight::FlashLight;
-			TurnFlash(true);
-			break;
-		}
 		case ChosenLight::FlashLight: {
-			ActiveLight = ChosenLight::None;
-			TurnFlash(false);
+			TurnTorch(false);
+			TurnFlash(IsLightActive);
 			break;
 		}
 		case ChosenLight::TorchLight: {
-			ActiveLight = ChosenLight::FlashLight;
-			TurnFlash(true);
-			TurnTorch(false);
+			TurnTorch(IsLightActive);
+			TurnFlash(false);
 			break;
 		}
 	}
 }
 
-void APlayerCharacter::TriggerTorchLight(const FInputActionValue& Value) {
+void APlayerCharacter::SwitchLight(const FInputActionValue& Value) {
 	switch (ActiveLight) {
-		case ChosenLight::None: {
-			ActiveLight = ChosenLight::TorchLight;
-			TurnTorch(true);
-			break;
-		}
 		case ChosenLight::FlashLight: {
 			ActiveLight = ChosenLight::TorchLight;
-			TurnTorch(true);
+			TurnTorch(IsLightActive);
 			TurnFlash(false);
 			break;
 		}
 		case ChosenLight::TorchLight: {
-			ActiveLight = ChosenLight::None;
+			ActiveLight = ChosenLight::FlashLight;
 			TurnTorch(false);
+			TurnFlash(IsLightActive);
 			break;
 		}
 	}
@@ -423,4 +414,22 @@ int32 APlayerCharacter::GetWoodMaxCapacity() const {
 
 int32 APlayerCharacter::GetBatteryMaxCapacity() const {
 	return BatteryMaxCapacity;
+}
+
+int32 APlayerCharacter::IsFlashlightActive() const {
+	int32 State = 0;
+	if (ActiveLight == ChosenLight::FlashLight) {
+		State += 1;
+		if (IsLightActive) { State += 1; }
+	}
+	return State;
+}
+
+int32 APlayerCharacter::IsTorchlightActive() const {
+	int32 State = 0;
+	if (ActiveLight == ChosenLight::TorchLight) {
+		State += 1;
+		if (IsLightActive) { State += 1; }
+	}
+	return State;
 }

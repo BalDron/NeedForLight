@@ -82,7 +82,8 @@ private:
 	void Look(const FInputActionValue& Value);
 
 
-	ChosenLight ActiveLight = ChosenLight::None;
+	ChosenLight ActiveLight = ChosenLight::FlashLight;
+	bool IsLightActive = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float LightEnergyConsumption = 1.f;
@@ -94,7 +95,6 @@ private:
 	float FlashLightCapacity  = 0.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float FlashLightMaxIntensity = 5000.f;
-	void TriggerFlashLight(const FInputActionValue& Value);
 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
@@ -104,8 +104,9 @@ private:
 	float TorchLightCapacity = 0.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Lights")
 	float TorchLightMaxIntensity = 5000.f;
-	void TriggerTorchLight(const FInputActionValue& Value);
 
+	void TriggerLight(const FInputActionValue& Value);
+	void SwitchLight(const FInputActionValue& Value);
 	void ReloadLight(const FInputActionValue& Value);
 	void TurnFlash(bool On);
 	void TurnTorch(bool On);
@@ -173,4 +174,9 @@ private:
 	UFUNCTION(BlueprintPure)
 	int32 GetBatteryMaxCapacity() const;
 
+	UFUNCTION(BlueprintPure)
+	int32 IsFlashlightActive() const;
+
+	UFUNCTION(BlueprintPure)
+	int32 IsTorchlightActive() const;
 };
