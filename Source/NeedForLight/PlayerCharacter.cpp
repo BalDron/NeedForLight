@@ -67,8 +67,6 @@ void APlayerCharacter::BeginPlay()
 	FlashLightCapacity = FlashLightMaxCapacity;
 	TorchLightCapacity = TorchLightMaxCapacity;
 	
-	CanGrabWidget = CreateWidget(GetWorld(), CanGrabWidgetClass);
-	CanPutWidget = CreateWidget(GetWorld(), CanPutWidgetClass);
 	HUD = CreateWidget(GetWorld(), HUDClass);
 	HUD->AddToViewport();
 
@@ -255,32 +253,18 @@ void APlayerCharacter::SwitchLight(const FInputActionValue& Value) {
 
 void APlayerCharacter::ViewWidgets() {
 	FHitResult ObserverHit;
-	bool bIsAnythingToObserve = CheckForPick(ObserverHit);
-	if (bIsAnythingToObserve) {
-		AActor* HitActor = ObserverHit.GetActor();
-		if (CanGrabWidget != nullptr && !CanGrabWidgetIsAdded) {
-			CanGrabWidget->AddToViewport();
-			CanGrabWidgetIsAdded = true;
-		}
+	bool bIsAnythingToPick = CheckForPick(ObserverHit);
+	if (bIsAnythingToPick) {
+		CanIPick = true;
 	} else {
-		if (CanGrabWidgetIsAdded){
-			CanGrabWidget->RemoveFromParent();
-			CanGrabWidgetIsAdded = false;
-		}
+		CanIPick = false;
 	}
 	FHitResult GrabberHit;
-	bool bIsAnythingToPick = CheckForPut(GrabberHit);
-	if (bIsAnythingToPick) {
-		AActor* HitActor = GrabberHit.GetActor();
-		if (CanPutWidget != nullptr && !CanPutWidgetIsAdded) {
-			CanPutWidget->AddToViewport();
-			CanPutWidgetIsAdded = true;
-		}
+	bool bIsAnywhereToPut = CheckForPut(GrabberHit);
+	if (bIsAnywhereToPut) {
+		CanIPut = true;
 	} else {
-		if (CanPutWidgetIsAdded){
-			CanPutWidget->RemoveFromParent();
-			CanPutWidgetIsAdded = false;
-		}
+		CanIPut = false;
 	}
 }
 
@@ -432,4 +416,12 @@ int32 APlayerCharacter::IsTorchlightActive() const {
 		if (IsLightActive) { State += 1; }
 	}
 	return State;
+}
+
+bool APlayerCharacter::CanPlayerPick() const {
+	return CanIPick;
+}
+
+bool APlayerCharacter::CanPlayerPut() const {
+	return CanIPut;
 }

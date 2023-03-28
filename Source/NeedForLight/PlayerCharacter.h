@@ -140,12 +140,6 @@ private:
 	void PutObject(const FInputActionValue& Value);
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> CanGrabWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> CanPutWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> HUDClass;
 
 	UPROPERTY()
@@ -179,4 +173,12 @@ private:
 
 	UFUNCTION(BlueprintPure)
 	int32 IsTorchlightActive() const;
+
+	bool CanIPick = false;
+	UFUNCTION(BlueprintPure)
+	bool CanPlayerPick() const;
+
+	bool CanIPut = false;
+	UFUNCTION(BlueprintPure)
+	bool CanPlayerPut() const;
 };
