@@ -7,6 +7,7 @@
 #include "FriendAIController.generated.h"
 
 class UBehaviorTree;
+class AActor;
 
 /**
  * 
@@ -27,5 +28,11 @@ protected:
 private:
     UPROPERTY(EditDefaultsOnly)
     UBehaviorTree* AIBehavior;
+
+    AActor* BlockingPlate;
+
+    bool bReleased = false;
+
+    void FindBlockingPlate();
 	
 };

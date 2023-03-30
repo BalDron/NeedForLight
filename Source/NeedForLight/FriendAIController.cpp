@@ -5,6 +5,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "PlayerCharacter.h"
+#include "FriendCharacter.h"
+#include "GameFramework/Actor.h"
+#include "EngineUtils.h"
 
 void AFriendAIController::BeginPlay() {
     Super::BeginPlay();
@@ -18,15 +21,35 @@ void AFriendAIController::BeginPlay() {
             Player
         );
 
-        GetBlackboardComponent()->SetValueAsBool(
-            TEXT("CanWalk"),
-            false
+        GetBlackboardComponent()->ClearValue(
+            TEXT("CanWalk")
         );
+    }
+    FindBlockingPlate();
+}
+
+void AFriendAIController::FindBlockingPlate() {
+    for (AActor* Actor : TActorRange<AActor>(GetWorld())) {
+        if (Actor != nullptr && Actor->Tags.Contains("BlockingPlate")) {
+            BlockingPlate = Actor;
+            bReleased = false;
+            break;
+        }
     }
 }
 
 void AFriendAIController::Tick(float DeltaTime) {
     Super::Tick(DeltaTime);
+    bool CanWalkState = GetBlackboardComponent()->GetValueAsBool(
+        TEXT("CanWalk")
+    );
+    if (CanWalkState) {
+        UE_LOG(LogTemp, Warning, TEXT("%d"), BlockingPlate);
+    }
+    if (!bReleased && BlockingPlate == nullptr) {
+        ReleaseFriend();
+        bReleased = true;
+    }
 }
 
 void AFriendAIController::ReleaseFriend() {
