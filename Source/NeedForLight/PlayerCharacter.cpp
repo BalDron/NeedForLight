@@ -23,6 +23,7 @@
 #include "Blueprint/UserWidget.h"
 #include "WoodStock.h"
 #include "MortalityComponent.h"
+#include "DestructionComponent.h"
 
 #include "LevelOneGameMode.h"
 
@@ -108,6 +109,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PEI->BindAction(InputActions->Put, ETriggerEvent::Triggered, this, &APlayerCharacter::PutObject);
 	PEI->BindAction(InputActions->ReloadLight, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadLight);
 	PEI->BindAction(InputActions->Call, ETriggerEvent::Triggered, this, &APlayerCharacter::Call);
+	PEI->BindAction(InputActions->Hit, ETriggerEvent::Triggered, this, &APlayerCharacter::Hit);
 }
 
 void APlayerCharacter::UpdateLights(float DeltaTime) {
@@ -419,4 +421,29 @@ bool APlayerCharacter::CanPlayerPut() const {
 
 bool APlayerCharacter::DoesPlayerHaveCrowbar() const {
 	return IsCrowBarPicked;
+}
+
+void APlayerCharacter::Hit(const FInputActionValue& Value) {
+    FVector Start = Camera->GetComponentLocation();
+	FVector End = Start + Camera->GetForwardVector() * MaxPutPickDistance;
+
+    FHitResult HitResult;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(HitRadius);
+	bool result = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		Sphere
+	);
+	if (result) {
+		AActor* HitActor = HitResult.GetActor();
+        UDestructionComponent* Destruction = Cast<UDestructionComponent>(
+            HitActor->GetComponentByClass(HitComponentClass)
+        );
+		if (Destruction != nullptr && IsCrowBarPicked) {
+			Destruction->GetHit(1);
+		}
+	}
 }

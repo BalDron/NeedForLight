@@ -154,6 +154,18 @@ private:
 	UUserWidget* HUD;
 
 	void ViewWidgets();
+
+    UPROPERTY(EditDefaultsOnly, Category = "Action")
+    float HitDistance = 50.f;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Action")
+    float HitRadius = 2.f;
+    
+	UPROPERTY(EditDefaultsOnly, Category = "Action")
+	TSubclassOf<class UActorComponent> HitComponentClass;
+
+
+	void Hit(const FInputActionValue& Value);
 	
 	UFUNCTION(BlueprintPure)
 	int32 GetWoodCapacity() const;
