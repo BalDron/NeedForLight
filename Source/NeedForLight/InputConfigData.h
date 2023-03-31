@@ -43,4 +43,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* Call;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* Hit;
 };
