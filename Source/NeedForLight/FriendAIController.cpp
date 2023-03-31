@@ -43,10 +43,7 @@ void AFriendAIController::Tick(float DeltaTime) {
     bool CanWalkState = GetBlackboardComponent()->GetValueAsBool(
         TEXT("CanWalk")
     );
-    if (CanWalkState) {
-        UE_LOG(LogTemp, Warning, TEXT("%d"), BlockingPlate);
-    }
-    if (!bReleased && BlockingPlate == nullptr) {
+    if (!bReleased && BlockingPlate->IsActorBeingDestroyed()) {
         ReleaseFriend();
         bReleased = true;
     }
