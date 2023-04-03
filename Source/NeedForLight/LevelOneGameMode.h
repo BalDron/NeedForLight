@@ -23,6 +23,7 @@ public:
 	void PlayerCalls();
 
 	void ProcessCharacterDeath(AActor* DeadActor);
+    void ProcessLevelExit();
 
 private:
 	class AFriendCharacter* FriendCharacter;
@@ -35,6 +36,12 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float RestartDelay = 3.f;
 	FTimerHandle RestartTimer;
+
+	UPROPERTY(EditDefaultsOnly)
+	float ExitDelay = 3.f;
+	FTimerHandle ExitTimer;
+
+    void QuitGame();
 
 	void CallFriend();
 

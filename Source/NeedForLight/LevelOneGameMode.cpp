@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/KismetSystemLibrary.h" 
 
 
 void ALevelOneGameMode::BeginPlay() {
@@ -69,4 +70,22 @@ void ALevelOneGameMode::ProcessCharacterDeath(AActor* DeadActor) {
         UE_LOG(LogTemp, Warning, TEXT("Your friend is dead."));
         DeadActor->Destroy();
     }
+}
+
+void ALevelOneGameMode::ProcessLevelExit() {
+    UE_LOG(LogTemp, Warning, TEXT("You won! Oh, wait..."));
+    GetWorldTimerManager().SetTimer(
+        ExitTimer, this,
+        &ALevelOneGameMode::QuitGame, 
+        ExitDelay
+    );
+}
+
+void ALevelOneGameMode::QuitGame() {
+    UKismetSystemLibrary::QuitGame(
+        this,
+        UGameplayStatics::GetPlayerController(this, 0),
+        EQuitPreference::Type::Quit,
+        true
+    );
 }
