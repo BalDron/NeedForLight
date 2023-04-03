@@ -133,22 +133,17 @@ private:
 
 	bool IsCrowBarPicked = false;
 
+    bool CheckForInteract(struct FHitResult& OutHitResult) const;
+	void InteractWithObject(const FInputActionValue& Value);
+
 	bool CheckForPick(struct FHitResult& OutHitResult) const;
-	void PickUpObject(const FInputActionValue& Value);
+	void PickOrInteract(const FInputActionValue& Value);
 
 	bool CheckForPut(struct FHitResult& OutHitResult) const;
 	void PutObject(const FInputActionValue& Value);
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> HUDClass;
-
-	UPROPERTY()
-	UUserWidget* CanGrabWidget;
-	bool CanGrabWidgetIsAdded = false;
-
-	UPROPERTY()
-	UUserWidget* CanPutWidget;
-	bool CanPutWidgetIsAdded = false;
 
 	UPROPERTY()
 	UUserWidget* HUD;
@@ -185,6 +180,10 @@ private:
 
 	UFUNCTION(BlueprintPure)
 	int32 IsTorchlightActive() const;
+
+	bool CanIInteract = false;
+	UFUNCTION(BlueprintPure)
+	bool CanPlayerInteract() const;
 
 	bool CanIPick = false;
 	UFUNCTION(BlueprintPure)

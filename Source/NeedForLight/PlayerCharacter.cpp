@@ -24,6 +24,7 @@
 #include "WoodStock.h"
 #include "MortalityComponent.h"
 #include "DestructionComponent.h"
+#include "TriggerLevelExit.h"
 
 #include "LevelOneGameMode.h"
 
@@ -105,7 +106,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PEI->BindAction(InputActions->Look, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 	PEI->BindAction(InputActions->TriggerLight, ETriggerEvent::Triggered, this, &APlayerCharacter::TriggerLight);
 	PEI->BindAction(InputActions->SwitchLight, ETriggerEvent::Triggered, this, &APlayerCharacter::SwitchLight);
-	PEI->BindAction(InputActions->PickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::PickUpObject);
+	PEI->BindAction(InputActions->PickUp, ETriggerEvent::Triggered, this, &APlayerCharacter::PickOrInteract);
 	PEI->BindAction(InputActions->Put, ETriggerEvent::Triggered, this, &APlayerCharacter::PutObject);
 	PEI->BindAction(InputActions->ReloadLight, ETriggerEvent::Triggered, this, &APlayerCharacter::ReloadLight);
 	PEI->BindAction(InputActions->Call, ETriggerEvent::Triggered, this, &APlayerCharacter::Call);
@@ -254,6 +255,13 @@ void APlayerCharacter::SwitchLight(const FInputActionValue& Value) {
 }
 
 void APlayerCharacter::ViewWidgets() {
+	FHitResult InteractorHit;
+	bool bIsAnythingToInteract = CheckForInteract(InteractorHit);
+	if (bIsAnythingToInteract) {
+		CanIInteract = true;
+	} else {
+		CanIInteract = false;
+	}
 	FHitResult ObserverHit;
 	bool bIsAnythingToPick = CheckForPick(ObserverHit);
 	if (bIsAnythingToPick) {
@@ -307,9 +315,7 @@ bool APlayerCharacter::CheckForPick(FHitResult& OutHitResult) const {
 	);
 	if (result) {
 		AActor* HitActor = OutHitResult.GetActor();
-		bool bCheckAnyTags = result && (
-			HitActor->Tags.Contains("Pickable")
-		);
+		bool bCheckAnyTags = HitActor->Tags.Contains("Pickable");
 		if (bCheckAnyTags) {
 			return true;
 		}
@@ -317,7 +323,41 @@ bool APlayerCharacter::CheckForPick(FHitResult& OutHitResult) const {
 	return false;
 }
 
-void APlayerCharacter::PickUpObject(const FInputActionValue& Value) {
+bool APlayerCharacter::CheckForInteract(FHitResult& OutHitResult) const {
+	FVector Start = Camera->GetComponentLocation();
+	FVector End = Start + Camera->GetForwardVector() * MaxPutPickDistance;
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius);
+	bool result = GetWorld()->SweepSingleByChannel(
+		OutHitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		Sphere
+	);
+	if (result) {
+		AActor* HitActor = OutHitResult.GetActor();
+		bool bCheckAnyTags = HitActor->Tags.Contains("Interactable");
+		if (bCheckAnyTags) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void APlayerCharacter::PickOrInteract(const FInputActionValue& Value) {
+    FHitResult IntractorHit;
+	bool bIsAnythingToInteract = CheckForInteract(IntractorHit);
+	if (bIsAnythingToInteract) {
+		AActor* HitActor = IntractorHit.GetActor();
+		if (HitActor->Tags.Contains("Exit")) {
+			ATriggerLevelExit* Exit = Cast<ATriggerLevelExit>(HitActor);
+            Exit->ExitLevel();
+		}
+        return;
+	}
+
 	FHitResult GrabberHit;
 	bool bIsAnythingToGrab = CheckForPick(GrabberHit);
 	if (bIsAnythingToGrab) {
@@ -410,6 +450,10 @@ int32 APlayerCharacter::IsTorchlightActive() const {
 	return State;
 }
 
+bool APlayerCharacter::CanPlayerInteract() const {
+	return CanIInteract;
+}
+
 bool APlayerCharacter::CanPlayerPick() const {
 	return CanIPick;
 }
@@ -417,7 +461,6 @@ bool APlayerCharacter::CanPlayerPick() const {
 bool APlayerCharacter::CanPlayerPut() const {
 	return CanIPut;
 }
-
 
 bool APlayerCharacter::DoesPlayerHaveCrowbar() const {
 	return IsCrowBarPicked;
